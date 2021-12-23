@@ -15,7 +15,7 @@ bool vizitat_transpusa[100005], vizitat[100005];
 
 class graf{
 private:
-    int n, m, cost_total,curent, parinte[100001], dimensiune[100001],distanta[1000];
+    int n, m, cost_total,curent,parinte[100001],dimensiune[100001],distanta[1000];
     vector <vector <int> > muchii;
     priority_queue <pair<int, int>, vector <pair<int,int>>, greater<pair<int,int>>> pq;
     vector <pair<int,int> >graf_ponderat;
@@ -24,7 +24,7 @@ private:
     int vizitate[50001];
     vector <int> adj_list[100001];
     vector < pair<int,int> > v[100005];
-    //-kosajaru
+    //kosajaru
     vector<int> graf_normal[100005];
     stack<int> S;
     vector<int> graf_transpus[100005];
@@ -233,40 +233,38 @@ void graf :: dfs_kosaraju(int nod)
 void graf :: scc()
 {
     int scc_nr = 0;
-    while( !S.empty() )
+    while(!S.empty())
     {   int curent=S.top();
         S.pop();
-        if( !vizitat_transpusa[curent] )
+        if(!vizitat_transpusa[curent])
         {scc_nr ++;
         dfs_transpus(curent, scc_nr);}
     }
 
     g<<scc_nr<<endl;
     for (int i=1; i<= scc_nr; i++)
-    {
-        for(int j: componente_conexe[i] )
+    {   for(int j: componente_conexe[i])
                 g<<j<<" ";
         g<<endl;
     }
 }
 
-void graf :: dfs_transpus(int nod, int ct)
+void graf::dfs_transpus(int nod, int componenta)
 {
-    vizitat_transpusa[nod] = 1;
-    componente_conexe[ct].push_back(nod);
-
-    for ( auto i : graf_transpus[nod] )
-        if ( !vizitat_transpusa[i] )
-            dfs_transpus(i, ct);
+    vizitat_transpusa[nod]=1;
+    componente_conexe[componenta].push_back(nod);
+    for (int i: graf_transpus[nod])
+        if (!vizitat_transpusa[i])
+            dfs_transpus(i, componenta);
 }
 
 void componente_tare_conexe(){
     int n ,m ;
-    f >> n >> m;
-    graf G(n, m);
+    f >>n>>m;
+    graf G(n,m);
     G.Citire_cu_transpusa();
-     for ( int i = 1; i <= n; i++ )
-        if ( ! vizitat[i] )
+     for (int i=1; i<=n; i++)
+        if (!vizitat[i])
             G.dfs_kosaraju(i);
     G.scc();
 }
@@ -525,26 +523,24 @@ void graf::royfloyd(){
     G.roy_floyd(matrice);
 }
 //---------------------------------------------TEMA-4-------------------------------------------------------------------------------------//
-//-----------Ciclu-Hamilton-------//
-void graf :: Euler(int s)
+//-----------Ciclu-Eulerian-------//
+void graf::Euler(int s)
 {
-    bool visited[500005];
-    for(int i;i<=n;i++)
-        visited[i]=false;
-    vector <int> rezultat;  //stocam rez final
-    vector <int> vect; //dam push_back elem cu care urm sa lucram
+    bool vizitat[500005];
+    vector<int> rezultat;  //stocam rez final
+    vector<int> vect; //dam push_back elem cu care urm sa lucram
     vect.push_back(s);      //adaugam nod start
-    while ( !vect.empty() )     //cat timp mai avem elem in vect
+    while (!vect.empty())     //cat timp mai avem elem in vect
     {
-        int curent = vect.back(); //noteam el curent
-        if ( ! v[curent].empty() ) //daca mai are noduri la care se ajunge pornind din el
+        int curent=vect.back(); //noteam el curent
+        if (!v[curent].empty()) //daca mai are noduri la care se ajunge pornind din el
         {
-            int urm = v[curent].back().first;
-            int nr = v[curent].back().second;
+            int urm=v[curent].back().first;
+            int nr=v[curent].back().second;
             v[curent].pop_back(); //stergem elementul din vector
-            if ( ! visited[nr] )    //daca la muchia cu nr respectiv nu s-a ajuns inca
+            if (!vizitat[nr])    //daca la muchia cu nr respectiv nu s-a ajuns inca
             {
-                visited[nr] = true;     //marcam vizitata si o adaugam in vect de prelucrare
+                vizitat[nr]=true;     //marcam vizitata si o adaugam in vect de prelucrare
                 vect.push_back(urm);
             }
         }
@@ -554,43 +550,29 @@ void graf :: Euler(int s)
             rezultat.push_back(curent); //il adaugam in vect final
         }
     }
-        for ( size_t i = 0; i < rezultat.size(); i++ )
-            g << rezultat[i] << " ";
+        for (size_t i=0; i<rezultat.size(); i++)
+            g <<rezultat[i]<<" ";
 }
 
-void graf :: CicluEuler ()
+void graf::CicluEuler()
 {
     int x, y, grd[100005];
     bool vizitat[100005];
-    for(int i=0; i<=n;i++)
-        vizitat[i]=false;
-    for ( int i = 1; i <= m; i++ )
+    for (int i=1; i<=m; i++)
     {
-        f >> x >> y;
-        v[x].push_back( make_pair(y, i) );
-        v[y].push_back( make_pair(x, i) );
+        f>>x>>y;
+        v[x].push_back(make_pair(y,i));
+        v[y].push_back(make_pair(x,i));
         grd[x]++;//gradul lui x
         grd[y]++;//gradul lui y
     }
 
-    for ( int i = 0; i <= n; i++ )
+    for ( int i=0; i<=n; i++ )
         if ( grd[i]%2==1 )
         {
             g << "-1";
             return;
         }
-
-    /*dfs(1); //parcurgere dfs ca sa aflam daca graful e comp conexa
-
-    for(int i=1;i<=n;i++)
-    {
-        if(vizitat[i]==false)
-        {
-            g<<-1;
-            return;
-        }
-    }
-    */
     Euler(1);
 }
 
